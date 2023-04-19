@@ -204,13 +204,14 @@ static void motion_to_mouse_scroll(keyball_motion_t *m, report_mouse_t *r, bool 
         if (r->v != 0) keyball.is_scrolling_v = true;
     }
     // reset scrolling flag
-    if (r->h == 0 && r->v == 0) {
-        if (TIMER_DIFF_32(now, keyball.linearscroll_reset_time) >= KEYBALL_LINEARSCROLL_RESET_TIMER) {
-            keyball.is_scrolling_h = false;
-            keyball.is_scrolling_v = false;
-        }
-    } else {
+    if (!keyball_get_scroll_mode()) {
+        keyball.is_scrolling_h = false;
+        keyball.is_scrolling_v = false;
+    } else if (r->h != 0 || r->v != 0) {
         keyball.linearscroll_reset_time = now;
+    } else if (TIMER_DIFF_32(now, keyball.linearscroll_reset_time) >= KEYBALL_LINEARSCROLL_RESET_TIMER) {
+        keyball.is_scrolling_h = false;
+        keyball.is_scrolling_v = false;
     }
     // block scrolling by flag
     if (!keyball.is_scrolling_h) r->h = 0;
