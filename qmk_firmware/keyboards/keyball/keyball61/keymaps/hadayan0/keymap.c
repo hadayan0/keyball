@@ -195,7 +195,8 @@ void keyball_oled_render_layerinfo_inv(bool is_inverted) {
 void oledkit_render_info_user(void) {
     keyball_oled_render_keyinfo_inv(is_current_layer_mouse());
     keyball_oled_render_ballinfo_inv(is_current_layer_mouse());
-    keyball_oled_render_layerinfo_inv(is_current_layer_mouse());
+    //keyball_oled_render_layerinfo_inv(is_current_layer_mouse());
+    keyball_oled_render_layerinfo();
 }
 
 #endif
