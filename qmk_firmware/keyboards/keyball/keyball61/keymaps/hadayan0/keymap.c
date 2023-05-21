@@ -66,10 +66,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [0] = LAYOUT_universal(
     KC_ESC   , KC_1     , KC_2     , KC_3     , KC_4     , KC_5     ,                                  KC_6     , KC_7     , KC_8     , KC_9     , KC_0     , KC_BSPC  ,
-    KC_TAB   , KC_Q     , KC_SCLN  , KC_F     , KC_E     , KC_COMM  ,                                  KC_W     , KC_R     , KC_Y     , KC_T     , KC_P     , KC_INT3  ,
+    KC_TAB   , KC_Q     , KC_SCLN  , KC_F     , KC_E     , KC_COMM  ,                                  KC_W     , KC_R     , KC_Y     , KC_T     , KC_P     , KC_LBRC  ,
     KC_LCTL  , KC_I     , KC_A     , KC_U     , KC_O     , KC_DOT   ,                                  KC_G     , KC_H     , KC_J     , KC_K     , KC_L     , KC_ENT   ,
     KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_SLSH  , KC_QUOT  ,              TO(2)  , KC_S     , KC_M     , KC_SPC   , KC_D     , KC_B     , KC_RSFT  ,
-    MO(3)    , KC_GRV   , KC_LGUI  , KC_LALT  , MO(2)    , KC_MINS  , KC_LANG1 ,              KC_LANG2,KC_N     , _______  , _______  , _______  , KC_INT1  , KC_RCTL
+    MO(3)    , KC_GRV   , KC_LGUI  , KC_LALT  , MO(2)    , KC_MINS  , KC_LANG2 ,              KC_LANG1,KC_N     , _______  , _______  , _______  , KC_INT1  , KC_RCTL
   ),
 
   [1] = LAYOUT_universal(
@@ -104,12 +104,12 @@ bool is_current_layer_mouse(void) {
   return current_layer == 2;
 }
 
-layer_state_t layer_state_set_user(layer_state_t state) {
-    return state;
-}
+//layer_state_t layer_state_set_user(layer_state_t state) {
+//    return state;
+//}
 
 layer_state_t default_layer_state_set_user(layer_state_t state) {
-    current_layer = get_highest_layer(state);
+    //current_layer = get_highest_layer(state);
     return state;
 }
 
@@ -237,41 +237,42 @@ void oledkit_render_info_user(void) {
 
 #endif
 
-//const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-//    {0, 122, 128, 255, 64}
-//);
-//const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-//    {0, 122, HSV_RED}
-//);
-//const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-//    {0, 122, 64, 255, 64}
-//);
-//const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-//    {0, 122, 192, 192, 64}
-//);
-//
-//// Now define the array of layers. Later layers take precedence
-//const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-//    my_layer1_layer
-//    ,my_layer2_layer
-//    ,my_layer3_layer
-//    ,my_layer4_layer
-//);
-//
-//void keyboard_post_init_user(void) {
-//    // Enable the LED layers
-//    rgblight_layers = my_rgb_layers;
+const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 122, 128, 255, 64}
+);
+const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 122, HSV_RED}
+);
+const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 122, 64, 255, 64}
+);
+const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 122, 192, 192, 64}
+);
+
+// Now define the array of layers. Later layers take precedence
+const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
+    my_layer1_layer
+    ,my_layer2_layer
+    ,my_layer3_layer
+    ,my_layer4_layer
+);
+
+void keyboard_post_init_user(void) {
+    // Enable the LED layers
+    rgblight_layers = my_rgb_layers;
+}
+
+//bool led_update_user(led_t led_state) {
+//    rgblight_set_layer_state(0, led_state.caps_lock);
+//    return true;
 //}
-//
-////bool led_update_user(led_t led_state) {
-////    rgblight_set_layer_state(0, led_state.caps_lock);
-////    return true;
-////}
-//
-//layer_state_t layer_state_set_user(layer_state_t state) {
-//    rgblight_set_layer_state(0, layer_state_cmp(state, 0));
-//    //rgblight_set_layer_state(1, layer_state_cmp(state, 1));
-//    rgblight_set_layer_state(2, layer_state_cmp(state, 2));
-//    rgblight_set_layer_state(3, layer_state_cmp(state, 3));
-//    return state;
-//}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    rgblight_set_layer_state(0, layer_state_cmp(state, 0));
+    //rgblight_set_layer_state(1, layer_state_cmp(state, 1));
+    rgblight_set_layer_state(2, layer_state_cmp(state, 2));
+    rgblight_set_layer_state(3, layer_state_cmp(state, 3));
+    current_layer = get_highest_layer(state);
+    return state;
+}

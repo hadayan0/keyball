@@ -37,3 +37,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define KEYBALL_SCROLLSNAP_ENABLE 0
 #define KEYBALL_LINEARSCROLL_ENABLE 1
+
+#define RGBLIGHT_LAYERS
