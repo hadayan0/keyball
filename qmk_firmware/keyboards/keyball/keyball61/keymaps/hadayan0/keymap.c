@@ -24,12 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../../../lib/keyball/keyball.h"
 
 bool is_current_layer_mouse(void);
-static char to_1x(uint8_t x);
-static const char *format_4d(int8_t d);
-void keyball_oled_render_ballinfo_inv(bool is_inverted);
-void keyball_oled_render_keyinfo_inv(bool is_inverted);
-void keyball_oled_render_layerinfo_inv(bool is_inverted);
-
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -37,8 +31,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_ESC   , KC_1     , KC_2     , KC_3     , KC_4     , KC_5     ,                                  KC_6     , KC_7     , KC_8     , KC_9     , KC_0     , KC_BSPC  ,
     KC_TAB   , KC_Q     , KC_SCLN  , KC_F     , KC_E     , KC_COMM  ,                                  KC_W     , KC_R     , KC_Y     , KC_T     , KC_P     , JP_AT    ,
     KC_LCTL  , KC_I     , KC_A     , KC_U     , KC_O     , KC_DOT   ,                                  KC_G     , KC_H     , KC_J     , KC_K     , KC_L     , KC_ENT   ,
-    KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_SLSH  , JP_COLN  ,              TO(2)  , KC_S     , KC_M     , KC_SPC   , KC_D     , KC_B     , KC_RSFT  ,
-    MO(3)    , JP_CIRC  , KC_LGUI  , KC_LALT  , MO(2)    , KC_MINS  , KC_LANG2 ,              KC_LANG1,KC_N     , _______  , _______  , _______  , JP_BSLS  , KC_RCTL
+    KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_SLSH  , JP_COLN  ,            TO(2)    , KC_S     , KC_M     , KC_SPC   , KC_D     , KC_B     , KC_RSFT  ,
+    MO(3)    , JP_CIRC  , KC_LGUI  , KC_LALT  , MO(2)    , KC_MINS  , KC_LANG2 ,            KC_LANG1 , KC_N     , _______  , _______  , _______  , JP_BSLS  , KC_RCTL
   ),
 
   [1] = LAYOUT_universal(
@@ -86,147 +80,49 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
 
 #    include "lib/oledkit/oledkit.h"
 
-static char to_1x(uint8_t x) {
-    x &= 0x0f;
-    return x < 10 ? x + '0' : x + 'a' - 10;
-}
-
-const char PROGMEM code_to_name_hada[] = {
-    'a', 'b', 'c', 'd', 'e', 'f',  'g', 'h', 'i',  'j',
-    'k', 'l', 'm', 'n', 'o', 'p',  'q', 'r', 's',  't',
-    'u', 'v', 'w', 'x', 'y', 'z',  '1', '2', '3',  '4',
-    '5', '6', '7', '8', '9', '0',  'R', 'E', 'B',  'T',
-    '_', '-', '=', '[', ']', '\\', '#', ';', '\'', '`',
-    ',', '.', '/',
-};
-
-static const char *format_4d(int8_t d) {
-    static char buf[5] = {0}; // max width (4) + NUL (1)
-    char        lead   = ' ';
-    if (d < 0) {
-        d    = -d;
-        lead = '-';
-    }
-    buf[3] = (d % 10) + '0';
-    d /= 10;
-    if (d == 0) {
-        buf[2] = lead;
-        lead   = ' ';
-    } else {
-        buf[2] = (d % 10) + '0';
-        d /= 10;
-    }
-    if (d == 0) {
-        buf[1] = lead;
-        lead   = ' ';
-    } else {
-        buf[1] = (d % 10) + '0';
-        d /= 10;
-    }
-    buf[0] = lead;
-    return buf;
-}
-
-void keyball_oled_render_keyinfo_inv(bool is_inverted) {
-    // Format: `Key :  R{row}  C{col} K{kc}  '{name}`
-    //
-    // Where `kc` is lower 8 bit of keycode.
-    // Where `name` is readable label for `kc`, valid between 4 and 56.
-    //
-    // It is aligned to fit with output of keyball_oled_render_ballinfo().
-    // For example:
-    //
-    //     Key :  R2  C3 K06  'c
-    //     Ball:   0   0   0   0
-    //
-    uint8_t keycode = keyball.last_kc;
-
-    oled_write_P(PSTR("Key :  R"), is_inverted);
-    oled_write_char(to_1x(keyball.last_pos.row), is_inverted);
-    oled_write_P(PSTR("  C"), is_inverted);
-    oled_write_char(to_1x(keyball.last_pos.col), is_inverted);
-    if (keycode) {
-        oled_write_P(PSTR(" K"), is_inverted);
-        oled_write_char(to_1x(keycode >> 4), is_inverted);
-        oled_write_char(to_1x(keycode), is_inverted);
-    } else {
-        oled_write_P(PSTR("    "), is_inverted);
-    }
-    if (keycode >= 4 && keycode < 57) {
-        oled_write_P(PSTR("  '"), is_inverted);
-        char name = pgm_read_byte(code_to_name_hada + keycode - 4);
-        oled_write_char(name, is_inverted);
-    } else {
-        //oled_advance_page(true);
-        oled_write_P(PSTR("    "), is_inverted);
-    }
-}
-
-void keyball_oled_render_ballinfo_inv(bool is_inverted) {
-    // Format: `Ball:{mouse x}{mouse y}{mouse h}{mouse v}`
-    //         `    CPI{CPI} S{SCROLL_MODE} D{SCROLL_DIV}`
-    //
-    // Output example:
-    //
-    //     Ball: -12  34   0   0
-    //
-    oled_write_P(PSTR("Ball:"), is_inverted);
-    oled_write(format_4d(keyball.last_mouse.x), is_inverted);
-    oled_write(format_4d(keyball.last_mouse.y), is_inverted);
-    oled_write(format_4d(keyball.last_mouse.h), is_inverted);
-    oled_write(format_4d(keyball.last_mouse.v), is_inverted);
-    // CPI
-    oled_write_P(PSTR("     CPI"), is_inverted);
-    oled_write(format_4d(keyball_get_cpi()) + 1, is_inverted);
-    oled_write_P(PSTR("00  S"), is_inverted);
-    oled_write_char(keyball.scroll_mode ? '1' : '0', is_inverted);
-    oled_write_P(PSTR("  D"), is_inverted);
-    oled_write_char('0' + keyball_get_scroll_div(), is_inverted);
-}
-
-void keyball_oled_render_layerinfo_inv(bool is_inverted) {
+void keyball_oled_render_layerinfo(bool is_inverted) {
     oled_write_P(PSTR("Layer: "), is_inverted);
     oled_write_char(current_layer + '0', is_inverted);
     oled_write_P(PSTR("  "), is_inverted);
 }
 
-void keyball_oled_render_scrollinfo_inv(bool is_inverted) {
+void keyball_oled_render_scrollinfo(bool is_inverted) {
     oled_write_P(PSTR("Scroll: "), is_inverted);
     oled_write_char(keyball.is_scrolling_h ? '-' : ' ', is_inverted);
     oled_write_char(keyball.is_scrolling_v ? '|' : ' ', is_inverted);
     oled_write_P(PSTR(" "), is_inverted);
 }
 
-void keyball_oled_render_systeminfo_inv(bool is_inverted) {
-    oled_write_P(PSTR("B:"), is_inverted);
-    oled_write_char(keyball.this_have_ball ? '1' : '0', is_inverted);
-    oled_write_P(PSTR(" E:"), is_inverted);
-    oled_write_char(keyball.that_enable ? '1' : '0', is_inverted);
-    oled_write_P(PSTR(" L:"), is_inverted);
-    oled_write_char(is_keyboard_left() ? '1' : '0', is_inverted);
-    oled_write_P(PSTR(" M:"), is_inverted);
-    oled_write_char(is_keyboard_master() ? '1' : '0', is_inverted);
-    oled_write_P(PSTR("      "), is_inverted);
-}
+//void keyball_oled_render_systeminfo(bool is_inverted) {
+//    oled_write_P(PSTR("B:"), is_inverted);
+//    oled_write_char(keyball.this_have_ball ? '1' : '0', is_inverted);
+//    oled_write_P(PSTR(" E:"), is_inverted);
+//    oled_write_char(keyball.that_enable ? '1' : '0', is_inverted);
+//    oled_write_P(PSTR(" L:"), is_inverted);
+//    oled_write_char(is_keyboard_left() ? '1' : '0', is_inverted);
+//    oled_write_P(PSTR(" M:"), is_inverted);
+//    oled_write_char(is_keyboard_master() ? '1' : '0', is_inverted);
+//    oled_write_P(PSTR("      "), is_inverted);
+//}
 
 void oledkit_render_info_user(void) {
-    keyball_oled_render_keyinfo_inv(is_current_layer_mouse());
-    //keyball_oled_render_systeminfo_inv(is_current_layer_mouse());
-    keyball_oled_render_ballinfo_inv(is_current_layer_mouse());
-    keyball_oled_render_layerinfo_inv(is_current_layer_mouse());
-    keyball_oled_render_scrollinfo_inv(is_current_layer_mouse());
+    keyball_oled_render_keyinfo(is_current_layer_mouse());
+    //keyball_oled_render_systeminfo(is_current_layer_mouse());
+    keyball_oled_render_ballinfo(is_current_layer_mouse());
+    keyball_oled_render_layerinfo(is_current_layer_mouse());
+    keyball_oled_render_scrollinfo(is_current_layer_mouse());
 }
 
 #endif
 
-#define LEDNO_ALL 0,80
-#define LEDNO_LEFT_UNDER  29, 8
-#define LEDNO_RIGHT_UNDER 37, 7
-#define LEDNO_UNDER LEDNO_RIGHT_UNDER
-
-#define HSV_CYAN_DARK   128, 255, 32
-#define HSV_GREEN_DARK   64, 255, 32
-#define HSV_PURPLE_DARK 192, 192, 32
+#define LEDNO_UNDER 29, 15
+//#define LEDNO_LEFT_UNDER  29, 8
+//#define LEDNO_RIGHT_UNDER 37, 7
+//#define LEDNO_UNDER LEDNO_RIGHT_UNDER
+//#define LEDNO_ALL 0,80
+//#define HSV_CYAN_DARK   128, 255, 32
+//#define HSV_GREEN_DARK   64, 255, 32
+//#define HSV_PURPLE_DARK 192, 192, 32
 
 // for debug
 //const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
@@ -255,46 +151,59 @@ void oledkit_render_info_user(void) {
 //    {LEDNO_ALL, HSV_PURPLE_DARK}
 //);
 
-const rgblight_segment_t PROGMEM my_layer1_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_LEFT_UNDER, HSV_CYAN}
+const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_UNDER, HSV_CYAN}
 );
-const rgblight_segment_t PROGMEM my_layer2_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_LEFT_UNDER, HSV_RED}
+const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_UNDER, HSV_RED}
 );
-const rgblight_segment_t PROGMEM my_layer3_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_LEFT_UNDER, HSV_YELLOW}
+const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_UNDER, HSV_YELLOW}
 );
-const rgblight_segment_t PROGMEM my_layer4_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_LEFT_UNDER, HSV_PURPLE}
+const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_UNDER, HSV_PURPLE}
 );
 
-const rgblight_segment_t PROGMEM my_layer1_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_RIGHT_UNDER, HSV_CYAN}
-);
-const rgblight_segment_t PROGMEM my_layer2_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_RIGHT_UNDER, HSV_RED}
-);
-const rgblight_segment_t PROGMEM my_layer3_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_RIGHT_UNDER, HSV_YELLOW}
-);
-const rgblight_segment_t PROGMEM my_layer4_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_RIGHT_UNDER, HSV_PURPLE}
-);
+//const rgblight_segment_t PROGMEM my_layer1_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_LEFT_UNDER, HSV_CYAN}
+//);
+//const rgblight_segment_t PROGMEM my_layer2_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_LEFT_UNDER, HSV_RED}
+//);
+//const rgblight_segment_t PROGMEM my_layer3_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_LEFT_UNDER, HSV_YELLOW}
+//);
+//const rgblight_segment_t PROGMEM my_layer4_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_LEFT_UNDER, HSV_PURPLE}
+//);
+//
+//const rgblight_segment_t PROGMEM my_layer1_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_RIGHT_UNDER, HSV_CYAN}
+//);
+//const rgblight_segment_t PROGMEM my_layer2_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_RIGHT_UNDER, HSV_RED}
+//);
+//const rgblight_segment_t PROGMEM my_layer3_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_RIGHT_UNDER, HSV_YELLOW}
+//);
+//const rgblight_segment_t PROGMEM my_layer4_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_RIGHT_UNDER, HSV_PURPLE}
+//);
 
 // Now define the array of layers. Later layers take precedence
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    //my_layer1_layer
-    //,my_layer2_layer
-    //,my_layer3_layer
-    //,my_layer4_layer
-    my_layer1_layer_l
-    ,my_layer2_layer_l
-    ,my_layer3_layer_l
-    ,my_layer4_layer_l
-    ,my_layer1_layer_r
-    ,my_layer2_layer_r
-    ,my_layer3_layer_r
-    ,my_layer4_layer_r
+    my_layer1_layer
+    ,my_layer2_layer
+    ,my_layer3_layer
+    ,my_layer4_layer
+    //my_layer1_layer_l
+    //,my_layer2_layer_l
+    //,my_layer3_layer_l
+    //,my_layer4_layer_l
+    //,my_layer1_layer_r
+    //,my_layer2_layer_r
+    //,my_layer3_layer_r
+    //,my_layer4_layer_r
 );
 
 void keyboard_post_init_user(void) {
@@ -313,10 +222,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(1, layer_state_cmp(state, 1));
     rgblight_set_layer_state(2, layer_state_cmp(state, 2));
     rgblight_set_layer_state(3, layer_state_cmp(state, 3));
-    rgblight_set_layer_state(4, layer_state_cmp(state, 0));
-    rgblight_set_layer_state(5, layer_state_cmp(state, 1));
-    rgblight_set_layer_state(6, layer_state_cmp(state, 2));
-    rgblight_set_layer_state(7, layer_state_cmp(state, 3));
+    //rgblight_set_layer_state(4, layer_state_cmp(state, 0));
+    //rgblight_set_layer_state(5, layer_state_cmp(state, 1));
+    //rgblight_set_layer_state(6, layer_state_cmp(state, 2));
+    //rgblight_set_layer_state(7, layer_state_cmp(state, 3));
     current_layer = get_highest_layer(state);
     return state;
 }

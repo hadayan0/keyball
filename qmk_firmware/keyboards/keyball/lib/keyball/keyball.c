@@ -375,7 +375,7 @@ const char PROGMEM code_to_name[] = {
 // clang-format on
 #endif
 
-void keyball_oled_render_ballinfo(void) {
+void keyball_oled_render_ballinfo(bool is_inverted) {
 #ifdef OLED_ENABLE
     // Format: `Ball:{mouse x}{mouse y}{mouse h}{mouse v}`
     //         `    CPI{CPI} S{SCROLL_MODE} D{SCROLL_DIV}`
@@ -384,22 +384,22 @@ void keyball_oled_render_ballinfo(void) {
     //
     //     Ball: -12  34   0   0
     //
-    oled_write_P(PSTR("Ball:"), false);
-    oled_write(format_4d(keyball.last_mouse.x), false);
-    oled_write(format_4d(keyball.last_mouse.y), false);
-    oled_write(format_4d(keyball.last_mouse.h), false);
-    oled_write(format_4d(keyball.last_mouse.v), false);
+    oled_write_P(PSTR("Ball:"), is_inverted);
+    oled_write(format_4d(keyball.last_mouse.x), is_inverted);
+    oled_write(format_4d(keyball.last_mouse.y), is_inverted);
+    oled_write(format_4d(keyball.last_mouse.h), is_inverted);
+    oled_write(format_4d(keyball.last_mouse.v), is_inverted);
     // CPI
-    oled_write_P(PSTR("     CPI"), false);
-    oled_write(format_4d(keyball_get_cpi()) + 1, false);
-    oled_write_P(PSTR("00  S"), false);
-    oled_write_char(keyball.scroll_mode ? '1' : '0', false);
-    oled_write_P(PSTR("  D"), false);
-    oled_write_char('0' + keyball_get_scroll_div(), false);
+    oled_write_P(PSTR("     CPI"), is_inverted);
+    oled_write(format_4d(keyball_get_cpi()) + 1, is_inverted);
+    oled_write_P(PSTR("00  S"), is_inverted);
+    oled_write_char(keyball.scroll_mode ? '1' : '0', is_inverted);
+    oled_write_P(PSTR("  D"), is_inverted);
+    oled_write_char('0' + keyball_get_scroll_div(), is_inverted);
 #endif
 }
 
-void keyball_oled_render_keyinfo(void) {
+void keyball_oled_render_keyinfo(bool is_inverted) {
 #ifdef OLED_ENABLE
     // Format: `Key :  R{row}  C{col} K{kc}  '{name}`
     //
@@ -414,21 +414,24 @@ void keyball_oled_render_keyinfo(void) {
     //
     uint8_t keycode = keyball.last_kc;
 
-    oled_write_P(PSTR("Key :  R"), false);
-    oled_write_char(to_1x(keyball.last_pos.row), false);
-    oled_write_P(PSTR("  C"), false);
-    oled_write_char(to_1x(keyball.last_pos.col), false);
+    oled_write_P(PSTR("Key :  R"), is_inverted);
+    oled_write_char(to_1x(keyball.last_pos.row), is_inverted);
+    oled_write_P(PSTR("  C"), is_inverted);
+    oled_write_char(to_1x(keyball.last_pos.col), is_inverted);
     if (keycode) {
-        oled_write_P(PSTR(" K"), false);
-        oled_write_char(to_1x(keycode >> 4), false);
-        oled_write_char(to_1x(keycode), false);
+        oled_write_P(PSTR(" K"), is_inverted);
+        oled_write_char(to_1x(keycode >> 4), is_inverted);
+        oled_write_char(to_1x(keycode), is_inverted);
+    } else {
+        oled_write_P(PSTR("    "), is_inverted);
     }
     if (keycode >= 4 && keycode < 57) {
-        oled_write_P(PSTR("  '"), false);
+        oled_write_P(PSTR("  '"), is_inverted);
         char name = pgm_read_byte(code_to_name + keycode - 4);
-        oled_write_char(name, false);
+        oled_write_char(name, is_inverted);
     } else {
-        oled_advance_page(true);
+        //oled_advance_page(true);
+        oled_write_P(PSTR("    "), is_inverted);
     }
 #endif
 }
