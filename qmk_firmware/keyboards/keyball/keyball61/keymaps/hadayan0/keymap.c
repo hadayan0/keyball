@@ -197,8 +197,21 @@ void keyball_oled_render_scrollinfo_inv(bool is_inverted) {
     oled_write_P(PSTR(" "), is_inverted);
 }
 
+void keyball_oled_render_systeminfo_inv(bool is_inverted) {
+    oled_write_P(PSTR("B:"), is_inverted);
+    oled_write_char(keyball.this_have_ball ? '1' : '0', is_inverted);
+    oled_write_P(PSTR(" E:"), is_inverted);
+    oled_write_char(keyball.that_enable ? '1' : '0', is_inverted);
+    oled_write_P(PSTR(" L:"), is_inverted);
+    oled_write_char(is_keyboard_left() ? '1' : '0', is_inverted);
+    oled_write_P(PSTR(" M:"), is_inverted);
+    oled_write_char(is_keyboard_master() ? '1' : '0', is_inverted);
+    oled_write_P(PSTR("      "), is_inverted);
+}
+
 void oledkit_render_info_user(void) {
     keyball_oled_render_keyinfo_inv(is_current_layer_mouse());
+    //keyball_oled_render_systeminfo_inv(is_current_layer_mouse());
     keyball_oled_render_ballinfo_inv(is_current_layer_mouse());
     keyball_oled_render_layerinfo_inv(is_current_layer_mouse());
     keyball_oled_render_scrollinfo_inv(is_current_layer_mouse());

@@ -40,13 +40,14 @@ __attribute__((weak)) bool oled_task_user(void) {
     if (is_keyboard_master()) {
         oledkit_render_info_user();
     } else {
+        //oledkit_render_info_user();
         oledkit_render_logo_user();
     }
     return true;
 }
 
 __attribute__((weak)) oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    return !is_keyboard_master() ? OLED_ROTATION_180 : rotation;
+    return !is_keyboard_left() ? OLED_ROTATION_180 : rotation;
 }
 
 #endif // OLED_ENABLE
