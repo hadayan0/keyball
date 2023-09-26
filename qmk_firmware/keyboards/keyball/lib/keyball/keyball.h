@@ -48,6 +48,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define KEYBALL_SCROLLSNAP_TENSION_THRESHOLD 12
 #endif
 
+#ifndef KEYBALL_LINEARSCROLL_ENABLE
+#    define KEYBALL_LINEARSCROLL_ENABLE 0
+#endif
+
+#ifndef KEYBALL_LINEARSCROLL_RESET_TIMER
+#    define KEYBALL_LINEARSCROLL_RESET_TIMER 300
+#endif
+
+#ifndef KEYBALL_LINEARSCROLL_ALLOW_TIMER
+#    define KEYBALL_LINEARSCROLL_ALLOW_TIMER 10
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // Constants
 
@@ -129,6 +141,11 @@ typedef struct {
     uint16_t       last_kc;
     keypos_t       last_pos;
     report_mouse_t last_mouse;
+
+    bool is_scrolling_h;
+    bool is_scrolling_v;
+    uint32_t linearscroll_set_time;
+    uint32_t linearscroll_reset_time;
 } keyball_t;
 
 typedef enum {
@@ -147,11 +164,11 @@ extern keyball_t keyball;
 
 /// keyball_oled_render_ballinfo renders ball information to OLED.
 /// It uses just 21 columns to show the info.
-void keyball_oled_render_ballinfo(void);
+void keyball_oled_render_ballinfo(bool is_inverted);
 
 /// keyball_oled_render_keyinfo renders last processed key information to OLED.
 /// It shows column, row, key code, and key name (if available).
-void keyball_oled_render_keyinfo(void);
+void keyball_oled_render_keyinfo(bool is_inverted);
 
 /// keyball_oled_render_layerinfo renders current layer information to OLED.
 /// It shows layer mask with '#' for active layers and '-' for inactive layers.
