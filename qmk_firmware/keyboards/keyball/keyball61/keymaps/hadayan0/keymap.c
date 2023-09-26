@@ -29,18 +29,18 @@ bool is_current_layer_mouse(void);
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_universal(
     KC_ESC   , KC_1     , KC_2     , KC_3     , KC_4     , KC_5     ,                                  KC_6     , KC_7     , KC_8     , KC_9     , KC_0     , KC_BSPC  ,
-    KC_TAB   , KC_Q     , KC_SCLN  , KC_F     , KC_E     , KC_COMM  ,                                  KC_W     , KC_R     , KC_Y     , KC_T     , KC_P     , JP_AT    ,
+    KC_TAB   , KC_Q     , KC_LANG2 , KC_LANG1 , KC_E     , KC_COMM  ,                                  KC_W     , KC_R     , KC_Y     , KC_T     , KC_P     , KC_SPC   ,
     KC_LCTL  , KC_I     , KC_A     , KC_U     , KC_O     , KC_DOT   ,                                  KC_G     , KC_H     , KC_J     , KC_K     , KC_L     , KC_ENT   ,
-    KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_SLSH  , JP_COLN  ,            TO(2)    , KC_S     , KC_M     , KC_SPC   , KC_D     , KC_B     , KC_RSFT  ,
-    MO(3)    , JP_CIRC  , KC_LGUI  , KC_LALT  , MO(2)    , KC_MINS  , KC_LANG2 ,            KC_LANG1 , KC_N     , _______  , _______  , _______  , JP_BSLS  , KC_RCTL
+    KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_SLSH  , JP_COLN  ,            TO(2)    , KC_S     , KC_BTN1  , KC_BTN3  , KC_BTN2  , SCRL_MO  , KC_D     ,
+    MO(3)    , JP_AT    , KC_LGUI  , KC_LALT  , KC_MINS  , KC_N     , KC_F     ,            KC_B     , KC_M     , _______  , _______  , _______  , KC_RSFT  , KC_RCTL
   ),
 
   [1] = LAYOUT_universal(
-    RGB_TOG  , _______  , _______  , _______  , _______  , _______  ,                                  RGB_M_P  , RGB_M_B  , RGB_M_R  , RGB_M_SW , RGB_M_SN , RGB_M_K  ,
-    RGB_MOD  , RGB_HUI  , RGB_SAI  , RGB_VAI  , _______  , _______  ,                                  RGB_M_X  , RGB_M_G  , RGB_M_T  , RGB_M_TW , _______  , _______  ,
-    RGB_RMOD , RGB_HUD  , RGB_SAD  , RGB_VAD  , _______  , _______  ,                                  CPI_D1K  , CPI_D100 , CPI_I100 , CPI_I1K  , KBC_SAVE , KBC_RST  ,
-    _______  , _______  , SCRL_DVD , SCRL_DVI , SCRL_MO  , SCRL_TO  , EEP_RST  ,            TO(0)    , KC_HOME  , KC_PGDN  , KC_PGUP  , KC_END   , _______  , _______  ,
-    RESET    , _______  , KC_LEFT  , KC_DOWN  , KC_UP    , KC_RGHT  , _______  ,            _______  , KC_BSPC  , _______  , _______  , _______  , _______  , RESET
+    _______  , KC_NUM   , KC_KP_7  , KC_KP_8  , KC_KP_9  , KC_PSLS  ,                                  _______  , _______  , _______  , _______  , _______  , RESET    ,
+    _______  , KC_PDOT  , KC_KP_4  , KC_KP_5  , KC_KP_6  , KC_PAST  ,                                  _______  , _______  , _______  , _______  , _______  , KBC_SAVE ,
+    _______  , KC_KP_0  , KC_KP_1  , KC_KP_2  , KC_KP_3  , KC_PMNS  ,                                  CPI_I100 , SCRL_DVI , RGB_HUI  , RGB_SAI  , RGB_VAI  , RGB_MOD  ,
+    _______  , _______  , _______  , _______  , _______  , KC_PPLS  , KC_PENT  ,            TO(0)    , CPI_D100 , SCRL_DVD , RGB_HUD  , RGB_SAD  , RGB_VAD  , RGB_TOG  ,
+    _______  , _______  , KC_LEFT  , KC_DOWN  , KC_UP    , KC_RGHT  , _______  ,            KC_RGUI  , KC_RALT  , _______  , _______  , _______  , _______  , _______
   ),
 
   [2] = LAYOUT_universal(
@@ -93,36 +93,43 @@ void keyball_oled_render_scrollinfo(bool is_inverted) {
     oled_write_P(PSTR(" "), is_inverted);
 }
 
-//void keyball_oled_render_systeminfo(bool is_inverted) {
-//    oled_write_P(PSTR("B:"), is_inverted);
-//    oled_write_char(keyball.this_have_ball ? '1' : '0', is_inverted);
-//    oled_write_P(PSTR(" E:"), is_inverted);
-//    oled_write_char(keyball.that_enable ? '1' : '0', is_inverted);
-//    oled_write_P(PSTR(" L:"), is_inverted);
-//    oled_write_char(is_keyboard_left() ? '1' : '0', is_inverted);
-//    oled_write_P(PSTR(" M:"), is_inverted);
-//    oled_write_char(is_keyboard_master() ? '1' : '0', is_inverted);
-//    oled_write_P(PSTR("      "), is_inverted);
-//}
+void keyball_oled_render_systeminfo(bool is_inverted) {
+    oled_write_P(PSTR("B:"), is_inverted);
+    oled_write_char(keyball.this_have_ball ? '1' : '0', is_inverted);
+    oled_write_P(PSTR(" E:"), is_inverted);
+    oled_write_char(keyball.that_enable ? '1' : '0', is_inverted);
+    oled_write_P(PSTR(" L:"), is_inverted);
+    oled_write_char(is_keyboard_left() ? '1' : '0', is_inverted);
+    oled_write_P(PSTR(" M:"), is_inverted);
+    oled_write_char(is_keyboard_master() ? '1' : '0', is_inverted);
+    oled_write_P(PSTR("      "), is_inverted);
+}
 
 void oledkit_render_info_user(void) {
-    keyball_oled_render_keyinfo(is_current_layer_mouse());
-    //keyball_oled_render_systeminfo(is_current_layer_mouse());
-    keyball_oled_render_ballinfo(is_current_layer_mouse());
-    keyball_oled_render_layerinfo(is_current_layer_mouse());
-    keyball_oled_render_scrollinfo(is_current_layer_mouse());
+    //keyball_oled_render_keyinfo(is_current_layer_mouse());
+    keyball_oled_render_systeminfo(is_current_layer_mouse());
+    if (is_keyboard_master()) {
+        keyball_oled_render_ballinfo(is_current_layer_mouse());
+        keyball_oled_render_layerinfo(is_current_layer_mouse());
+        keyball_oled_render_scrollinfo(is_current_layer_mouse());
+    } else {
+        oled_advance_page(true);
+    }
 }
 
 #endif
 
-#define LEDNO_UNDER 29, 15
+#define LEDNO_FRONT_L 0,29
+#define LEDNO_FRONT_R 44,27
+#define LEDNO_BACK 29, 15
 //#define LEDNO_LEFT_UNDER  29, 8
 //#define LEDNO_RIGHT_UNDER 37, 7
-//#define LEDNO_UNDER LEDNO_RIGHT_UNDER
 //#define LEDNO_ALL 0,80
-//#define HSV_CYAN_DARK   128, 255, 32
-//#define HSV_GREEN_DARK   64, 255, 32
-//#define HSV_PURPLE_DARK 192, 192, 32
+#define HSV_CYAN_DARK   128, 255, 48
+#define HSV_RED_DARK      0, 255, 48
+#define HSV_GREEN_DARK   64, 255, 48
+#define HSV_YELLOW_DARK  43, 255, 48
+#define HSV_PURPLE_DARK 192, 192, 48
 
 // for debug
 //const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
@@ -151,17 +158,43 @@ void oledkit_render_info_user(void) {
 //    {LEDNO_ALL, HSV_PURPLE_DARK}
 //);
 
-const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_UNDER, HSV_CYAN}
+//const rgblight_segment_t PROGMEM my_layer1_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_BACK, HSV_CYAN}
+//);
+//const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_BACK, HSV_RED}
+//);
+//const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_BACK, HSV_YELLOW}
+//);
+//const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+//    {LEDNO_BACK, HSV_PURPLE}
+//);
+
+const rgblight_segment_t PROGMEM my_layer1_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_L, HSV_CYAN_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer2_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_UNDER, HSV_RED}
+const rgblight_segment_t PROGMEM my_layer2_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_L, HSV_RED_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer3_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_UNDER, HSV_YELLOW}
+const rgblight_segment_t PROGMEM my_layer3_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_L, HSV_YELLOW_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-    {LEDNO_UNDER, HSV_PURPLE}
+const rgblight_segment_t PROGMEM my_layer4_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_L, HSV_PURPLE_DARK}
+);
+
+const rgblight_segment_t PROGMEM my_layer1_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_R, HSV_CYAN_DARK}
+);
+const rgblight_segment_t PROGMEM my_layer2_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_R, HSV_RED_DARK}
+);
+const rgblight_segment_t PROGMEM my_layer3_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_R, HSV_YELLOW_DARK}
+);
+const rgblight_segment_t PROGMEM my_layer4_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_FRONT_R, HSV_PURPLE_DARK}
 );
 
 //const rgblight_segment_t PROGMEM my_layer1_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
@@ -192,18 +225,18 @@ const rgblight_segment_t PROGMEM my_layer4_layer[] = RGBLIGHT_LAYER_SEGMENTS(
 
 // Now define the array of layers. Later layers take precedence
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    my_layer1_layer
-    ,my_layer2_layer
-    ,my_layer3_layer
-    ,my_layer4_layer
-    //my_layer1_layer_l
-    //,my_layer2_layer_l
-    //,my_layer3_layer_l
-    //,my_layer4_layer_l
-    //,my_layer1_layer_r
-    //,my_layer2_layer_r
-    //,my_layer3_layer_r
-    //,my_layer4_layer_r
+    //my_layer1_layer
+    //,my_layer2_layer
+    //,my_layer3_layer
+    //,my_layer4_layer
+    my_layer1_layer_l
+    ,my_layer2_layer_l
+    ,my_layer3_layer_l
+    ,my_layer4_layer_l
+    ,my_layer1_layer_r
+    ,my_layer2_layer_r
+    ,my_layer3_layer_r
+    ,my_layer4_layer_r
 );
 
 void keyboard_post_init_user(void) {
@@ -217,22 +250,15 @@ void keyboard_post_init_user(void) {
 //    return true;
 //}
 
-void oledkit_render_info_user(void) {
-    keyball_oled_render_keyinfo_inv(is_current_layer_mouse());
-    keyball_oled_render_ballinfo_inv(is_current_layer_mouse());
-    //keyball_oled_render_layerinfo_inv(is_current_layer_mouse());
-    keyball_oled_render_layerinfo();
-}
-
 layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(0, layer_state_cmp(state, 0));
     rgblight_set_layer_state(1, layer_state_cmp(state, 1));
     rgblight_set_layer_state(2, layer_state_cmp(state, 2));
     rgblight_set_layer_state(3, layer_state_cmp(state, 3));
-    //rgblight_set_layer_state(4, layer_state_cmp(state, 0));
-    //rgblight_set_layer_state(5, layer_state_cmp(state, 1));
-    //rgblight_set_layer_state(6, layer_state_cmp(state, 2));
-    //rgblight_set_layer_state(7, layer_state_cmp(state, 3));
+    rgblight_set_layer_state(4, layer_state_cmp(state, 0));
+    rgblight_set_layer_state(5, layer_state_cmp(state, 1));
+    rgblight_set_layer_state(6, layer_state_cmp(state, 2));
+    rgblight_set_layer_state(7, layer_state_cmp(state, 3));
     current_layer = get_highest_layer(state);
     return state;
 }
