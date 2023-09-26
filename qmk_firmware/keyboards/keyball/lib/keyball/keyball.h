@@ -170,6 +170,10 @@ void keyball_oled_render_ballinfo(bool is_inverted);
 /// It shows column, row, key code, and key name (if available).
 void keyball_oled_render_keyinfo(bool is_inverted);
 
+/// keyball_oled_render_layerinfo renders current layer information to OLED.
+/// It shows layer mask with '#' for active layers and '-' for inactive layers.
+void keyball_oled_render_layerinfo(void);
+
 /// keyball_get_scroll_mode gets current scroll mode.
 bool keyball_get_scroll_mode(void);
 

@@ -217,6 +217,13 @@ void keyboard_post_init_user(void) {
 //    return true;
 //}
 
+void oledkit_render_info_user(void) {
+    keyball_oled_render_keyinfo_inv(is_current_layer_mouse());
+    keyball_oled_render_ballinfo_inv(is_current_layer_mouse());
+    //keyball_oled_render_layerinfo_inv(is_current_layer_mouse());
+    keyball_oled_render_layerinfo();
+}
+
 layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(0, layer_state_cmp(state, 0));
     rgblight_set_layer_state(1, layer_state_cmp(state, 1));
