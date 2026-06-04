@@ -233,6 +233,32 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
             break;
     }
 #endif
+
+#if KEYBALL_LINEARSCROLL_ENABLE && !(KEYBALL_SCROLLSNAP_ENABLE)
+    uint32_t now = timer_read32();
+    // set scrolling flag
+    if ((!keyball.is_scrolling_h && !keyball.is_scrolling_v)
+        || TIMER_DIFF_32(now, keyball.linearscroll_set_time) < KEYBALL_LINEARSCROLL_ALLOW_TIMER) {
+        if (!keyball.is_scrolling_h && !keyball.is_scrolling_v) {
+            keyball.linearscroll_set_time = now;
+        }
+        if (r->h != 0) keyball.is_scrolling_h = true;
+        if (r->v != 0) keyball.is_scrolling_v = true;
+    }
+    // reset scrolling flag
+    if (!keyball_get_scroll_mode()) {
+        keyball.is_scrolling_h = false;
+        keyball.is_scrolling_v = false;
+    } else if (r->h != 0 || r->v != 0) {
+        keyball.linearscroll_reset_time = now;
+    } else if (TIMER_DIFF_32(now, keyball.linearscroll_reset_time) >= KEYBALL_LINEARSCROLL_RESET_TIMER) {
+        keyball.is_scrolling_h = false;
+        keyball.is_scrolling_v = false;
+    }
+    // block scrolling by flag
+    if (!keyball.is_scrolling_h) r->h = 0;
+    if (!keyball.is_scrolling_v) r->v = 0;
+#endif
 }
 
 static void motion_to_mouse(keyball_motion_t *m, report_mouse_t *r, bool is_left, bool as_scroll) {
@@ -391,7 +417,7 @@ const char PROGMEM code_to_name[] = {
 // clang-format on
 #endif
 
-void keyball_oled_render_ballinfo(void) {
+void keyball_oled_render_ballinfo(bool is_inverted) {
 #ifdef OLED_ENABLE
     // Format: `Ball:{mouse x}{mouse y}{mouse h}{mouse v}`
     //
