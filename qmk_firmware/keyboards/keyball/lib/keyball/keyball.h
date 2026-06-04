@@ -213,15 +213,11 @@ void keyball_on_apply_motion_to_mouse_scroll(keyball_motion_t *m, report_mouse_t
 
 /// keyball_oled_render_ballinfo renders ball information to OLED.
 /// It uses just 21 columns to show the info.
-void keyball_oled_render_ballinfo(bool is_inverted);
+void keyball_oled_render_ballinfo(void);
 
 /// keyball_oled_render_keyinfo renders last processed key information to OLED.
 /// It shows column, row, key code, and key name (if available).
-void keyball_oled_render_keyinfo(bool is_inverted);
-
-/// keyball_oled_render_layerinfo renders current layer information to OLED.
-/// It shows layer mask with '#' for active layers and '-' for inactive layers.
-void keyball_oled_render_layerinfo(void);
+void keyball_oled_render_keyinfo(void);
 
 /// keyball_oled_render_layerinfo renders current layer status information to
 /// OLED.  It shows layer mask with number (1~f) for active layers and '_' for
