@@ -221,7 +221,73 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
     }
 #elif KEYBALL_SCROLLSNAP_ENABLE == 2
     // New behavior
-    switch (keyball_get_scrollsnap_mode()) {
+    keyball_scrollsnap_mode_t mode = keyball_get_scrollsnap_mode();
+
+#    if KEYBALL_AUTO_SCROLLSNAP_ENABLE
+    uint32_t now = timer_read32();
+    if (!keyball_get_scroll_mode()) {
+        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_IDLE;
+    } else if (r->h != 0 || r->v != 0) {
+        keyball.auto_scrollsnap_reset_time = now;
+        if (mode == KEYBALL_SCROLLSNAP_MODE_FREE) {
+            uint16_t abs_h = abs(r->h);
+            uint16_t abs_v = abs(r->v);
+
+            switch (keyball.auto_scrollsnap_state) {
+                case KEYBALL_AUTO_SCROLLSNAP_STATE_IDLE:
+                    keyball.auto_scrollsnap_confirm_time = now;
+                    if (abs_v > abs_h * KEYBALL_AUTO_SCROLLSNAP_RATIO) {
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_VERTICAL;
+                    } else if (abs_h > abs_v * KEYBALL_AUTO_SCROLLSNAP_RATIO) {
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_HORIZONTAL;
+                    } else {
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL;
+                    }
+                    break;
+
+                case KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_VERTICAL:
+                    if (abs_v > abs_h * KEYBALL_AUTO_SCROLLSNAP_RATIO) {
+                        if (TIMER_DIFF_32(now, keyball.auto_scrollsnap_confirm_time) >= KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER) {
+                            keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_VERTICAL;
+                        }
+                    } else {
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL;
+                    }
+                    break;
+
+                case KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_HORIZONTAL:
+                    if (abs_h > abs_v * KEYBALL_AUTO_SCROLLSNAP_RATIO) {
+                        if (TIMER_DIFF_32(now, keyball.auto_scrollsnap_confirm_time) >= KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER) {
+                            keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_HORIZONTAL;
+                        }
+                    } else {
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    } else if (TIMER_DIFF_32(now, keyball.auto_scrollsnap_reset_time) >= KEYBALL_AUTO_SCROLLSNAP_RESET_TIMER) {
+        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_IDLE;
+    }
+
+    if (mode == KEYBALL_SCROLLSNAP_MODE_FREE) {
+        switch (keyball.auto_scrollsnap_state) {
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_VERTICAL:
+                mode = KEYBALL_SCROLLSNAP_MODE_VERTICAL;
+                break;
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_HORIZONTAL:
+                mode = KEYBALL_SCROLLSNAP_MODE_HORIZONTAL;
+                break;
+            default:
+                break;
+        }
+    }
+#    endif
+
+    switch (mode) {
         case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
             r->h = 0;
             break;
@@ -411,18 +477,44 @@ void keyball_oled_render_ballinfo(void) {
     oled_write(format_4d(keyball_get_cpi()) + 1, false);
     oled_write_P(PSTR("00 "), false);
 
-    // indicate scroll snap mode: "VT" (vertical), "HO" (horizontal), and "SCR" (free)
-#if 1 && KEYBALL_SCROLLSNAP_ENABLE == 2
-    switch (keyball_get_scrollsnap_mode()) {
-        case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
-            oled_write_P(PSTR("VT"), false);
-            break;
-        case KEYBALL_SCROLLSNAP_MODE_HORIZONTAL:
-            oled_write_P(PSTR("HO"), false);
-            break;
-        default:
-            oled_write_P(PSTR("\xBE\xBF"), false);
-            break;
+    // indicate scroll snap mode.
+#if KEYBALL_SCROLLSNAP_ENABLE == 2
+#    if KEYBALL_AUTO_SCROLLSNAP_ENABLE
+    if (keyball_get_scrollsnap_mode() == KEYBALL_SCROLLSNAP_MODE_FREE) {
+        switch (keyball.auto_scrollsnap_state) {
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_VERTICAL:
+                oled_write_P(PSTR("PV"), false);
+                break;
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_HORIZONTAL:
+                oled_write_P(PSTR("PH"), false);
+                break;
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_VERTICAL:
+                oled_write_P(PSTR("AV"), false);
+                break;
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_HORIZONTAL:
+                oled_write_P(PSTR("AH"), false);
+                break;
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL:
+                oled_write_P(PSTR("DG"), false);
+                break;
+            default:
+                oled_write_P(PSTR("\xBE\xBF"), false);
+                break;
+        }
+    } else
+#    endif
+    {
+        switch (keyball_get_scrollsnap_mode()) {
+            case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
+                oled_write_P(PSTR("VT"), false);
+                break;
+            case KEYBALL_SCROLLSNAP_MODE_HORIZONTAL:
+                oled_write_P(PSTR("HO"), false);
+                break;
+            default:
+                oled_write_P(PSTR("\xBE\xBF"), false);
+                break;
+        }
     }
 #else
     oled_write_P(PSTR("\xBE\xBF"), false);
@@ -523,6 +615,11 @@ void keyball_set_scroll_mode(bool mode) {
         keyball.scroll_mode_changed = timer_read32();
     }
     keyball.scroll_mode = mode;
+#if KEYBALL_SCROLLSNAP_ENABLE == 2 && KEYBALL_AUTO_SCROLLSNAP_ENABLE
+    if (!mode) {
+        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_IDLE;
+    }
+#endif
 }
 
 keyball_scrollsnap_mode_t keyball_get_scrollsnap_mode(void) {
@@ -536,6 +633,11 @@ keyball_scrollsnap_mode_t keyball_get_scrollsnap_mode(void) {
 void keyball_set_scrollsnap_mode(keyball_scrollsnap_mode_t mode) {
 #if KEYBALL_SCROLLSNAP_ENABLE == 2
     keyball.scrollsnap_mode = mode;
+#    if KEYBALL_AUTO_SCROLLSNAP_ENABLE
+    if (mode != KEYBALL_SCROLLSNAP_MODE_FREE) {
+        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_IDLE;
+    }
+#    endif
 #endif
 }
 
