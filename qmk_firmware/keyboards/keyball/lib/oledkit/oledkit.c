@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 __attribute__((weak)) void oledkit_render_logo_user(void) {
     // Require `OLED_FONT_H "keyboards/keyball/lib/logofont/logofont.c"`
     char ch = 0x80;
+    if (!is_keyboard_master() && is_keyboard_left()) {
+        oled_advance_page(false);
+    }
     for (int y = 0; y < 3; y++) {
         oled_write_P(PSTR("  "), false);
         for (int x = 0; x < 16; x++) {
@@ -55,7 +58,7 @@ __attribute__((weak)) oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     //
     // Additionally, by rotating it, the left side of the logo will be above
     // the OLED screen, giving it a natural look.
-    return !is_keyboard_master() ? OLED_ROTATION_180 : rotation;
+    return !is_keyboard_left() ? OLED_ROTATION_180 : rotation;
 }
 
 #endif // OLED_ENABLE
