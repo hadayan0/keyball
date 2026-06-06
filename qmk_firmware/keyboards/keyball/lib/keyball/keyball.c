@@ -241,7 +241,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
                     } else if (abs_h > abs_v * KEYBALL_AUTO_SCROLLSNAP_RATIO) {
                         keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_HORIZONTAL;
                     } else {
-                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_FREE_DIAGONAL;
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL;
                     }
                     break;
 
@@ -251,7 +251,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
                             keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_VERTICAL;
                         }
                     } else {
-                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_FREE_DIAGONAL;
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL;
                     }
                     break;
 
@@ -261,7 +261,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
                             keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_HORIZONTAL;
                         }
                     } else {
-                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_FREE_DIAGONAL;
+                        keyball.auto_scrollsnap_state = KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL;
                     }
                     break;
 
@@ -494,7 +494,7 @@ void keyball_oled_render_ballinfo(void) {
             case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_HORIZONTAL:
                 oled_write_P(PSTR("AH"), false);
                 break;
-            case KEYBALL_AUTO_SCROLLSNAP_STATE_FREE_DIAGONAL:
+            case KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_DIAGONAL:
                 oled_write_P(PSTR("DG"), false);
                 break;
             default:
