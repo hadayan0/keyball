@@ -55,7 +55,7 @@ __attribute__((weak)) oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     //
     // Additionally, by rotating it, the left side of the logo will be above
     // the OLED screen, giving it a natural look.
-    return !is_keyboard_master() ? OLED_ROTATION_180 : rotation;
+    return !is_keyboard_left() ? OLED_ROTATION_180 : rotation;
 }
 
 #endif // OLED_ENABLE
