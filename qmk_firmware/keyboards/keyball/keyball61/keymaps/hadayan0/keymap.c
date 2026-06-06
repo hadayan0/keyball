@@ -56,7 +56,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#ifdef RGBLIGHT_ENABLE
+#ifdef RGBLIGHT_LAYERS
 
 #define LEDNO_LEFT_TOP 0, 29
 #define LEDNO_RIGHT_TOP 44, 27
@@ -109,7 +109,10 @@ void keyboard_post_init_user(void) {
     rgblight_set_layer_state(4, true);
 }
 
+#endif
+
 layer_state_t layer_state_set_user(layer_state_t state) {
+#ifdef RGBLIGHT_LAYERS
     rgblight_set_layer_state(0, layer_state_cmp(state, 0));
     rgblight_set_layer_state(1, layer_state_cmp(state, 1));
     rgblight_set_layer_state(2, layer_state_cmp(state, 2));
@@ -118,10 +121,9 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(5, layer_state_cmp(state, 1));
     rgblight_set_layer_state(6, layer_state_cmp(state, 2));
     rgblight_set_layer_state(7, layer_state_cmp(state, 3));
+#endif
     return state;
 }
-
-#endif
 
 #ifdef OLED_ENABLE
 
