@@ -44,5 +44,6 @@ void keyball_on_adjust_layout(keyball_adjust_t v) {
     uint8_t lednum_that = (!keyball.that_enable && is_keyboard_master()) ? 0 : keyball.that_have_ball ? 34 : 37;
     rgblight_set_clipping_range(is_keyboard_left() ? 0 : lednum_that, lednum_this);
     rgblight_set_effect_range(0, lednum_this + lednum_that);
+    rgblight_set();
 #endif
 }
