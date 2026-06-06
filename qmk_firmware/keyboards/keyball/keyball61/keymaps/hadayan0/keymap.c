@@ -56,6 +56,75 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+#ifdef RGBLIGHT_LAYERS
+
+#define LEDNO_LEFT_TOP 0, 29
+#define LEDNO_RIGHT_TOP 44, 27
+
+#define HSV_CYAN_DARK 128, 255, 48
+#define HSV_RED_DARK 0, 255, 48
+#define HSV_YELLOW_DARK 43, 255, 48
+#define HSV_PURPLE_DARK 192, 192, 48
+
+const rgblight_segment_t PROGMEM layer0_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_LEFT_TOP, HSV_CYAN_DARK}
+);
+const rgblight_segment_t PROGMEM layer1_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_LEFT_TOP, HSV_RED_DARK}
+);
+const rgblight_segment_t PROGMEM layer2_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_LEFT_TOP, HSV_YELLOW_DARK}
+);
+const rgblight_segment_t PROGMEM layer3_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_LEFT_TOP, HSV_PURPLE_DARK}
+);
+
+const rgblight_segment_t PROGMEM layer0_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_RIGHT_TOP, HSV_CYAN_DARK}
+);
+const rgblight_segment_t PROGMEM layer1_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_RIGHT_TOP, HSV_RED_DARK}
+);
+const rgblight_segment_t PROGMEM layer2_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_RIGHT_TOP, HSV_YELLOW_DARK}
+);
+const rgblight_segment_t PROGMEM layer3_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
+    {LEDNO_RIGHT_TOP, HSV_PURPLE_DARK}
+);
+
+const rgblight_segment_t* const PROGMEM layer_leds[] = RGBLIGHT_LAYERS_LIST(
+    layer0_left_top,
+    layer1_left_top,
+    layer2_left_top,
+    layer3_left_top,
+    layer0_right_top,
+    layer1_right_top,
+    layer2_right_top,
+    layer3_right_top
+);
+
+void keyboard_post_init_user(void) {
+    rgblight_layers = layer_leds;
+    rgblight_set_layer_state(0, true);
+    rgblight_set_layer_state(4, true);
+}
+
+#endif
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+#ifdef RGBLIGHT_LAYERS
+    rgblight_set_layer_state(0, layer_state_cmp(state, 0));
+    rgblight_set_layer_state(1, layer_state_cmp(state, 1));
+    rgblight_set_layer_state(2, layer_state_cmp(state, 2));
+    rgblight_set_layer_state(3, layer_state_cmp(state, 3));
+    rgblight_set_layer_state(4, layer_state_cmp(state, 0));
+    rgblight_set_layer_state(5, layer_state_cmp(state, 1));
+    rgblight_set_layer_state(6, layer_state_cmp(state, 2));
+    rgblight_set_layer_state(7, layer_state_cmp(state, 3));
+#endif
+    return state;
+}
+
 #ifdef OLED_ENABLE
 
 #    include "lib/oledkit/oledkit.h"
