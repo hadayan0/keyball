@@ -58,7 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #ifndef KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER
-#    define KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER 20
+#    define KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER 12
 #endif
 
 #ifndef KEYBALL_AUTO_SCROLLSNAP_RATIO
