@@ -66,45 +66,45 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 #define HSV_YELLOW_DARK 43, 255, 48
 #define HSV_PURPLE_DARK 192, 192, 48
 
-const rgblight_segment_t PROGMEM my_layer0_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer0_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_LEFT_TOP, HSV_CYAN_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer1_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer1_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_LEFT_TOP, HSV_RED_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer2_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer2_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_LEFT_TOP, HSV_YELLOW_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer3_layer_l[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer3_left_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_LEFT_TOP, HSV_PURPLE_DARK}
 );
 
-const rgblight_segment_t PROGMEM my_layer0_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer0_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_RIGHT_TOP, HSV_CYAN_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer1_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer1_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_RIGHT_TOP, HSV_RED_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer2_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer2_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_RIGHT_TOP, HSV_YELLOW_DARK}
 );
-const rgblight_segment_t PROGMEM my_layer3_layer_r[] = RGBLIGHT_LAYER_SEGMENTS(
+const rgblight_segment_t PROGMEM layer3_right_top[] = RGBLIGHT_LAYER_SEGMENTS(
     {LEDNO_RIGHT_TOP, HSV_PURPLE_DARK}
 );
 
-const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    my_layer0_layer_l,
-    my_layer1_layer_l,
-    my_layer2_layer_l,
-    my_layer3_layer_l,
-    my_layer0_layer_r,
-    my_layer1_layer_r,
-    my_layer2_layer_r,
-    my_layer3_layer_r
+const rgblight_segment_t* const PROGMEM layer_leds[] = RGBLIGHT_LAYERS_LIST(
+    layer0_left_top,
+    layer1_left_top,
+    layer2_left_top,
+    layer3_left_top,
+    layer0_right_top,
+    layer1_right_top,
+    layer2_right_top,
+    layer3_right_top
 );
 
 void keyboard_post_init_user(void) {
-    rgblight_layers = my_rgb_layers;
+    rgblight_layers = layer_leds;
     rgblight_set_layer_state(0, true);
     rgblight_set_layer_state(4, true);
 }
