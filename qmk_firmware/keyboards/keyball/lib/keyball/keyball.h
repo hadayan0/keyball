@@ -49,6 +49,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define KEYBALL_SCROLLSNAP_TENSION_THRESHOLD 12
 #endif
 
+#ifndef KEYBALL_AUTO_SCROLLSNAP_ENABLE
+#    define KEYBALL_AUTO_SCROLLSNAP_ENABLE 0
+#endif
+
+#ifndef KEYBALL_AUTO_SCROLLSNAP_RESET_TIMER
+#    define KEYBALL_AUTO_SCROLLSNAP_RESET_TIMER 300
+#endif
+
+#ifndef KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER
+#    define KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER 20
+#endif
+
+#ifndef KEYBALL_AUTO_SCROLLSNAP_RATIO
+#    define KEYBALL_AUTO_SCROLLSNAP_RATIO 2
+#endif
+
 /// Specify SROM ID to be uploaded PMW3360DW (optical sensor).  It will be
 /// enabled high CPI setting or so.  Valid valus are 0x04 or 0x81.  Define this
 /// in your config.h to be enable.  Please note that using this option will
@@ -151,6 +167,17 @@ typedef enum {
     KEYBALL_SCROLLSNAP_MODE_FREE       = 2,
 } keyball_scrollsnap_mode_t;
 
+#if KEYBALL_SCROLLSNAP_ENABLE == 2 && KEYBALL_AUTO_SCROLLSNAP_ENABLE
+typedef enum {
+    KEYBALL_AUTO_SCROLLSNAP_STATE_IDLE = 0,
+    KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_VERTICAL,
+    KEYBALL_AUTO_SCROLLSNAP_STATE_PENDING_HORIZONTAL,
+    KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_VERTICAL,
+    KEYBALL_AUTO_SCROLLSNAP_STATE_LOCKED_HORIZONTAL,
+    KEYBALL_AUTO_SCROLLSNAP_STATE_FREE_DIAGONAL,
+} keyball_auto_scrollsnap_state_t;
+#endif
+
 typedef struct {
     bool this_have_ball;
     bool that_enable;
@@ -171,6 +198,11 @@ typedef struct {
     int8_t   scroll_snap_tension_h;
 #elif KEYBALL_SCROLLSNAP_ENABLE == 2
     keyball_scrollsnap_mode_t scrollsnap_mode;
+#    if KEYBALL_AUTO_SCROLLSNAP_ENABLE
+    keyball_auto_scrollsnap_state_t auto_scrollsnap_state;
+    uint32_t                        auto_scrollsnap_confirm_time;
+    uint32_t                        auto_scrollsnap_reset_time;
+#    endif
 #endif
 
     uint16_t       last_kc;
