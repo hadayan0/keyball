@@ -59,6 +59,7 @@ Keyball61向けに `hadayan0` keymapを追加しています。
 - VIA / Remap対応
 - OLED表示
 - RGBLIGHT
+- 音量・ミュートキー対応
 
 また、RGB制御、CPI変更、スクロール設定、Keyball設定の保存/リセット用キーを配置しています。
 
@@ -83,13 +84,19 @@ Remapで設定したRGB制御キーから、RGBアニメーション効果を利
 
 有効化している効果は以下です。
 
-- Breathing
-- Rainbow Swirl
 - Twinkle
 
 上面LEDはレイヤー色切り替えを優先するため、RGBアニメーションは主に底面LEDで見える想定です。
 
 関連PR: [#30 底面LED向けのRGB効果を追加](https://github.com/hadayan0/keyball/pull/30)
+
+### 音量・ミュートキー対応
+
+Remapで割り当てた `Mute` / `Vol-` / `Vol+` がWindowsへ送信できるように、`EXTRAKEY_ENABLE` を有効化しています。
+
+ファーム容量確保のため、One Shotキー機能は無効化しています。Remapで `OSM` / `OSL` を使う場合は、`NO_ACTION_ONESHOT` の見直しが必要です。
+
+関連PR: [#36 Windows向け音量・ミュートキーを有効化する](https://github.com/hadayan0/keyball/pull/36)
 
 ### スクロール操作
 
