@@ -75,7 +75,7 @@ static int16_t add16(int16_t a, int16_t b) {
 
 // divmod16 divides *v by div, returns the quotient, and assigns the remainder
 // to *v.
-static int16_t divmod16(int16_t *v, int16_t div) {
+static __attribute__((unused)) int16_t divmod16(int16_t *v, int16_t div) {
     int16_t r = *v / div;
     *v -= r * div;
     return r;
@@ -86,8 +86,29 @@ static inline int8_t clip2int8(int16_t v) {
     return (v) < -127 ? -127 : (v) > 127 ? 127 : (int8_t)v;
 }
 
+static inline mouse_hv_report_t clip2mouse_hv(int32_t v) {
+#ifdef WHEEL_EXTENDED_REPORT
+    return v < -32767 ? -32767 : v > 32767 ? 32767 : (mouse_hv_report_t)v;
+#else
+    return clip2int8(v);
+#endif
+}
+
+static mouse_hv_report_t divmod16_scroll(int16_t *v, int16_t div) {
+#ifdef POINTING_DEVICE_HIRES_SCROLL_ENABLE
+    uint16_t resolution = pointing_device_get_hires_scroll_resolution();
+    int32_t  scaled     = (int32_t)*v * resolution;
+    int32_t  quotient   = scaled / div;
+    int32_t  remainder  = scaled % div;
+    *v                  = remainder / resolution;
+    return clip2mouse_hv(quotient);
+#else
+    return clip2mouse_hv(divmod16(v, div));
+#endif
+}
+
 #ifdef OLED_ENABLE
-static const char *format_4d(int8_t d) {
+static const char *format_4d(int16_t d) {
     static char buf[5] = {0}; // max width (4) + NUL (1)
     char        lead   = ' ';
     if (d < 0) {
@@ -188,20 +209,20 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_move(keyball_motion_
 __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motion_t *m, report_mouse_t *r, bool is_left) {
     // consume motion of trackball.
     int16_t div = 1 << (keyball_get_scroll_div() - 1);
-    int16_t x = divmod16(&m->x, div);
-    int16_t y = divmod16(&m->y, div);
+    mouse_hv_report_t x = divmod16_scroll(&m->x, div);
+    mouse_hv_report_t y = divmod16_scroll(&m->y, div);
 
     // apply to mouse report.
 #if KEYBALL_MODEL == 61 || KEYBALL_MODEL == 39 || KEYBALL_MODEL == 147 || KEYBALL_MODEL == 44
-    r->h = clip2int8(y);
-    r->v = -clip2int8(x);
+    r->h = y;
+    r->v = -x;
     if (is_left) {
         r->h = -r->h;
         r->v = -r->v;
     }
 #elif KEYBALL_MODEL == 46
-    r->h = clip2int8(x);
-    r->v = clip2int8(y);
+    r->h = x;
+    r->v = y;
 #else
 #    error("unknown Keyball model")
 #endif
