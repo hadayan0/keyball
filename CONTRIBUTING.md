@@ -1,31 +1,25 @@
 # Contributing
 
-このリポジトリでは、通常開発用の `develop` とリリース用の `main` を分けて運用します。
+このリポジトリでは、`main` を唯一の統合ブランチとして運用します。
 
 ## ブランチ運用
 
-- `develop`: 通常の開発ブランチ
-- `main`: リリースブランチ
+- `main`: 統合ブランチ
+- `feature/*`, `fix/*`, `docs/*` など: 作業ブランチ
 
-機能追加・修正は原則として `develop` に取り込みます。
-
-リリース時は `develop` から `main` へPull Requestを作成します。
+機能追加・修正は、作業ブランチから `main` へ Pull Request を作成して取り込みます。
 
 ## Pull Requestのマージ方針
 
-通常の機能追加・修正PRを `develop` に取り込む場合は、必要に応じてSquash mergeを使って構いません。
-
-一方で、`develop` から `main` へ反映するリリースPRでは、Squash mergeを使いません。
-
-GitHub UIでリリースPRをマージする場合は、`Create a merge commit` を選択します。
+作業ブランチから `main` へのPRは、原則として `Squash and merge` を使います。
 
 ## 理由
 
-`develop` から `main` へのリリースPRをSquash mergeすると、`develop` 上の複数コミットが `main` 上の別の1コミットに潰されます。
+このリポジトリでは `develop` を使わず、`main` に直接統合するtrunk-based運用を採用します。
 
-その結果、Gitの履歴上は `develop` のコミットが `main` に取り込まれていないように見え、次回リリース時に不要なコンフリクトが発生しやすくなります。
+これにより、`main` と `develop` の履歴差分や、マージバック要否を都度判断する必要がなくなります。
 
-`Create a merge commit` を使うと、`main` のマージコミットが `develop` 側の履歴を親として持つため、`develop` の内容が `main` に取り込まれたことをGitが追跡できます。
+また、PRごとに1コミットへ整理することで、`main` の履歴を追いやすく保てます。
 
 ## リリース後の確認
 
@@ -33,4 +27,3 @@ GitHub UIでリリースPRをマージする場合は、`Create a merge commit` 
 
 - 関連Issueが意図どおりクローズされていること
 - 必要なリリースタグが作成されていること
-- `main` と `develop` の履歴が不要に分岐していないこと
