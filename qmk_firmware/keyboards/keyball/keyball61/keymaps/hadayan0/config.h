@@ -40,7 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 高解像度スクロールを有効化する場合は、以下2つをコメントアウト解除する。
 // その場合、QMK 0.22.14 に高解像度スクロール対応をbackportした
-// hadayan0/qmk_firmware の branch を使用する必要がある。
+// hadayan0/qmk_firmware の `hadayan0/hires-scroll-backport-0.22.14`
+// branch を使用する必要がある。
 //#define POINTING_DEVICE_HIRES_SCROLL_ENABLE
 //#define WHEEL_EXTENDED_REPORT
 
