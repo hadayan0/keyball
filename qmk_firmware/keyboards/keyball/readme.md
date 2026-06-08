@@ -32,6 +32,22 @@ See each directories for each keyboards in a table above.
 
     Currently Keyball firmwares are verified to compile with QMK 0.22.14
 
+    The `hadayan0` keymap can be built with the QMK 0.22.14 command above
+    while high resolution scrolling is disabled.
+
+    To enable high resolution scrolling for the `hadayan0` keymap, uncomment
+    `POINTING_DEVICE_HIRES_SCROLL_ENABLE` and `WHEEL_EXTENDED_REPORT` in
+    `keyball61/keymaps/hadayan0/config.h`, and use the QMK fork branch below
+    because it backports the required support to QMK 0.22.14.
+
+    This branch is a long-lived `0.22.14` backport branch for the `hadayan0`
+    keymap. It is not intended to be merged into QMK `master`; the related
+    QMK pull request is kept as a draft for diff/reference purposes.
+
+    ```console
+    $ git clone https://github.com/hadayan0/qmk_firmware.git --depth 1 --recurse-submodules --shallow-submodules -b hadayan0/hires-scroll-backport-0.22.14 qmk
+    ```
+
 3. Create a symbolic link to this `keyball/` directory from [qmk/qmk_firmware]'s `keyboards/` directory.
 
     ```console
