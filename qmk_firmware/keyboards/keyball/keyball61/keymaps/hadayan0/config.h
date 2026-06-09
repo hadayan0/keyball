@@ -39,6 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAP_CODE_DELAY 5
 
 #define KEYBALL_AUTO_SCROLLSNAP_ENABLE 1
+// 利用者ごとに好みが分かれるため、斜めスクロール判定の調整値は
+// keymap側で上書きしておく。現時点ではライブラリ既定値と同じ。
+// スクロール入力が止まったあと、どれだけ経ったら判定状態をリセットするか(ms)。
+#define KEYBALL_AUTO_SCROLLSNAP_RESET_TIMER 300
+// 縦/横どちらかに寄っていると確定するまでの時間(ms)。小さいほど斜めスクロールになりづらい。
+#define KEYBALL_AUTO_SCROLLSNAP_CONFIRM_TIMER 10
+// 縦/横どちらかに寄っていると見なす比率。大きいほど斜め扱いになりやすく、小さいほど縦横固定しやすい。
+#define KEYBALL_AUTO_SCROLLSNAP_RATIO 2
 
 //#define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #define AUTO_MOUSE_DEFAULT_LAYER 2
